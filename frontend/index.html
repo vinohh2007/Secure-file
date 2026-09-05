@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure File Sharing — E2EE (OOP)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0c0f14;
+      --bg1: #12161f;
+      --surface: #181e2a;
+      --surface2: #1f2736;
+      --border: rgba(255,255,255,.08);
+      --text: #eef2f8;
+      --muted: #8b95a8;
+      --accent: #5eead4;
+      --accent-dim: rgba(94, 234, 212, .12);
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(0,0,0,.35);
+      font-family: "DM Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: var(--bg0);
+      background-image:
+        radial-gradient(ellipse 120% 80% at 50% -30%, rgba(94, 234, 212, .15), transparent 50%),
+        radial-gradient(ellipse 80% 50% at 100% 50%, rgba(99, 102, 241, .08), transparent 45%);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    .shell { max-width: 920px; margin: 0 auto; padding: 2rem 1.25rem 2.5rem; }
+    header.hero {
+      text-align: center;
+      margin-bottom: 2.25rem;
+      padding: 1.5rem 0;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .72rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(94, 234, 212, .25);
+      padding: .35rem .85rem; border-radius: 999px; margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.65rem, 4vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: .5rem;
+      background: linear-gradient(135deg, #fff 0%, #a8b8d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p.sub { color: var(--muted); font-size: .95rem; max-width: 36rem; margin: 0 auto; }
+    .hero .links { margin-top: 1rem; font-size: .88rem; }
+    .hero .links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .hero .links a:hover { text-decoration: underline; }
+
+    .grid {
+      display: grid;
+      gap: 1.15rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+    section.card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.4rem;
+      box-shadow: var(--shadow);
+    }
+    section.card h2 {
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .65rem;
+    }
+    label { display: block; font-size: .8rem; font-weight: 500; color: var(--muted); margin-bottom: .35rem; }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: .6rem .75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg1);
+      color: var(--text);
+      font-size: .92rem;
+      font-family: inherit;
+      margin-bottom: .75rem;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: rgba(94, 234, 212, .45);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    textarea {
+      min-height: 100px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: .72rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: .5rem 0;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      padding: .58rem 1.15rem;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .12s, filter .12s;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: linear-gradient(135deg, #2dd4bf, #14b8a6); color: #042f2e; }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: #252d3d; }
+    .row { display: flex; gap: .75rem; flex-wrap: wrap; align-items: flex-end; }
+    .row > .field { flex: 1; min-width: 160px; }
+    .hint {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: .5rem;
+      line-height: 1.45;
+    }
+    .hint strong { color: #c4cbd8; font-weight: 600; }
+    ul.files {
+      list-style: none;
+      padding: 0;
+      margin: .75rem 0 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    ul.files li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem .85rem;
+      font-size: .88rem;
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .12s;
+    }
+    ul.files li:last-child { border-bottom: none; }
+    ul.files li:hover { background: #1a2330; }
+    .mono { font-family: "JetBrains Mono", monospace; font-size: .75rem; color: var(--muted); }
+
+    #log {
+      font-family: "JetBrains Mono", monospace;
+      font-size: .72rem;
+      line-height: 1.5;
+      background: var(--bg0);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem 1rem;
+      max-height: 240px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #log .ok { color: var(--ok); }
+    #log .err { color: var(--danger); }
+
+    footer.team {
+      margin-top: 2.5rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer.team h3 {
+      font-size: .72rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .team-grid {
+      display: grid;
+      gap: .65rem;
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: left;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 640px) {
+      .team-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .member {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .25rem;
+      padding: .75rem .85rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .82rem;
+    }
+    .member .roll {
+      font-family: "JetBrains Mono", monospace;
+      font-size: .68rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .member .name { font-weight: 600; color: var(--text); }
+    .oop-note {
+      margin-top: 1.25rem;
+      font-size: .78rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="badge">AES-256-GCM · RSA-OAEP · C++ OOP core</div>
+      <h1>Secure File Sharing</h1>
+      <p class="sub">End-to-end encrypted uploads. The server stores ciphertext only; decryption uses the receiver’s private key.</p>
+      <p class="links"><a id="docsLink" href="/docs">API documentation</a> · <span style="color:var(--muted)">Backend + OpenSSL CLI</span></p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Connection</h2>
+        <label for="apiBase">Backend URL</label>
+        <input type="text" id="apiBase" placeholder="http://127.0.0.1:8000" autocomplete="off" />
+      </section>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:1.15rem">
+      <section class="card">
+        <h2>Register</h2>
+        <label for="regName">Display name</label>
+        <input type="text" id="regName" placeholder="Your name" />
+        <button type="button" class="btn btn-primary" id="btnRegister">Create user</button>
+        <p class="hint">You receive a <strong>user_id</strong> and <strong>private key</strong> once. Save the key — it is not stored on the server.</p>
+      </section>
+
+      <section class="card">
+        <h2>Session (this browser)</h2>
+        <label for="userId">Your user_id</label>
+        <input type="text" id="userId" placeholder="UUID" autocomplete="off" />
+        <label for="privateKey">Private key (PEM)</label>
+        <textarea id="privateKey" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
+      </section>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:1.15rem">
+      <section class="card">
+        <h2>Upload</h2>
+        <p class="hint" style="margin-top:0;margin-bottom:1rem">
+          Register <strong>two users</strong> (two tabs). Paste the <strong>receiver’s</strong> full <strong>user_id</strong> below — not your own.
+        </p>
+        <div class="row">
+          <div class="field">
+            <label for="recipientId">Recipient user_id</label>
+            <input type="text" id="recipientId" placeholder="receiver UUID" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="expires">Expires (hours, optional)</label>
+            <input type="number" id="expires" min="1" placeholder="24" />
+          </div>
+        </div>
+        <label for="fileInput">File</label>
+        <input type="file" id="fileInput" />
+        <p style="margin-top:.75rem"><button type="button" class="btn btn-primary" id="btnUpload">Upload encrypted</button></p>
+      </section>
+
+      <section class="card">
+        <h2>Your files</h2>
+        <button type="button" class="btn btn-ghost" id="btnRefresh">Refresh list</button>
+        <ul class="files" id="fileList"></ul>
+      </section>
+    </div>
+
+    <div class="grid" style="margin-top:1.15rem">
+      <section class="card">
+        <h2>Decrypt (receiver)</h2>
+        <p class="hint" style="margin-top:0;margin-bottom:1rem">Use the <strong>receiver</strong> account: same user_id and private key as when you registered as receiver. Click a file in the list to fill <strong>file_id</strong>.</p>
+        <label for="decryptFileId">file_id</label>
+        <input type="text" id="decryptFileId" placeholder="uuid" autocomplete="off" />
+        <p style="margin-top:.75rem"><button type="button" class="btn btn-primary" id="btnDecrypt">Download decrypted</button></p>
+      </section>
+
+      <section class="card">
+        <h2>Activity log</h2>
+        <pre id="log"></pre>
+      </section>
+    </div>
+
+    <footer class="team">
+      <h3>Project team</h3>
+      <div class="team-grid">
+        <div class="member"><span class="roll">RA2511030010069</span><span class="name">SARAVANAJOTHI</span></div>
+        <div class="member"><span class="roll">RA2511030010077</span><span class="name">INBASRI</span></div>
+        <div class="member"><span class="roll">RA2511030010104</span><span class="name">SUSIN</span></div>
+      </div>
+      <p class="oop-note">Core logic: object-oriented C++ (<code>User</code>, <code>FileRecord</code>, <code>FileHandler</code>, <code>KeyManager</code>, <code>IEncryptionService</code>, <code>AccessControl</code>) with OpenSSL.</p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

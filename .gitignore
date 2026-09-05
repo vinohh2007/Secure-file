@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Build
+cpp_core/build/
+*.o
+*.a
+
+# Storage & secrets
+storage/files/*
+!storage/files/.gitkeep
+storage/app.db
+storage/logs/*.log
+*.pem
+!cpp_core/tests/fixtures/*.pem
+
+# IDE
+.idea/
+.vscode/
