@@ -295,7 +295,7 @@ def issue_download_token(file_id: str, user_id: str = Form(...)) -> dict[str, st
         raise HTTPException(status_code=410, detail="File expired")
 
     token = serializer.dumps({"file_id": file_id, "user_id": user_id})
-    return {"token": token, "expires_in_seconds": 900}
+    return {"token": token, "expires_in_seconds": "900"}
 
 
 @app.post("/download-by-token")
